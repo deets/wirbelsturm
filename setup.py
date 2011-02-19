@@ -14,7 +14,13 @@ setup(
     package_data = {'': ['*.html', '*.txt', '*.rst', '*.tpl']},
     zip_safe=False,
     include_package_data=True,
-    test_suite = 'nose.collector',
+    requires=[
+        "bottle",
+        "abl.jquery",
+        "PasteScript",
+        "PasteDeploy",
+        "WSGIUtils",
+        ]
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
@@ -27,6 +33,9 @@ setup(
     entry_points={
         'console_scripts': [
             'ws_frontend = wirbelsturm.frontend:main',
+            ],
+        'paste.app_factory': [
+            'main=wirbelsturm.frontend:app_factory',
             ]
-        }
+        },
 )

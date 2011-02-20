@@ -14,13 +14,16 @@ setup(
     package_data = {'': ['*.html', '*.txt', '*.rst', '*.tpl']},
     zip_safe=False,
     include_package_data=True,
-    requires=[
-        "bottle",
+    install_requires=[
         "abl.jquery",
-        "PasteScript",
+        "abl.util",
+        "bottle",
         "PasteDeploy",
+        "PasteScript",
+        "tornado",
+        "tw.forms",
         "WSGIUtils",
-        ]
+        ],
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',

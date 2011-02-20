@@ -33,6 +33,7 @@ class UserList(Widget):
 
     template = "wirbelsturm.user_list"
     engine_name = "genshi"
+    
 
     css_class = "user_list"
 
@@ -59,7 +60,9 @@ class CentralStationWidget(Widget):
         start="""If True (default), start the the dispatch immediatly."""
         )
 
-
+    template = "<div xmlns:py='http://genhsi.edgewall.org/' py:strip='True'/>"
+    engine_name = "genshi"
+    
     endpoint = None
     start = True
 

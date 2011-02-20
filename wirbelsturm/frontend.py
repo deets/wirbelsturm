@@ -16,8 +16,6 @@ from bottle import (
     TEMPLATE_PATH
     )
 
-import tornado.ioloop
-
 from tw.core.middleware import make_middleware
 import tw.mods.base
 
@@ -36,7 +34,7 @@ from abl.jquery.core import jquery_js
 
 
 from .chat import CHAT
-from .tornado import start_app, MainHandler
+from .tornado import start_app, CentralStation
 from .widgets import (
     UserList,
     CentralStationWidget,
@@ -100,11 +98,13 @@ def ajax_test():
 
 
 
+count = 0
 
 @bottle.route("/trigger")
 def trigger():
-    loop = tornado.ioloop.IOLoop.instance()
-    loop.add_callback(MainHandler.run_callbacks)
+    global count
+    CentralStation.instance().post("test", {"count" : count})
+    count += 1
     return "Called"
 
 

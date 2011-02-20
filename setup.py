@@ -18,6 +18,7 @@ setup(
         "abl.jquery",
         "abl.util",
         "bottle",
+        "Genshi",
         "PasteDeploy",
         "PasteScript",
         "tornado",
@@ -34,9 +35,6 @@ setup(
         'Programming Language :: Python',
     ],
     entry_points={
-        'console_scripts': [
-            'ws_frontend = wirbelsturm.frontend:main',
-            ],
         'paste.app_factory': [
             'main=wirbelsturm.frontend:app_factory',
             ]

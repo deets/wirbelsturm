@@ -36,6 +36,9 @@ from abl.jquery.core import jquery_js
 
 
 from .chat import CHAT
+from .tornado import start_app
+
+
 
 TEMPLATE_PATH.append(os.path.dirname(__file__))
 
@@ -133,6 +136,30 @@ def chat(usercookie):
     return dict(user_list=user_list.render(CHAT.userinfo()))
 
 
+test_widget = Widget(
+    "test_widget",
+    javascript=[JSLink(modname=__name__,
+                       filename="test.js",
+                       javascript=[jquery_js])],
+    template = "<div id='$id'/>"
+    )
+    
+
+@bottle.route("/ajax_test")
+@view("ajax_test")
+def ajax_test():
+    return dict(test_widget=test_widget.render())
+
+
+count = 0
+
+@route('/ajax_call')
+def ajax_call():
+    global count
+    count += 1
+    if not count % 10:
+        raise Exception()
+    return {'test' : count}
 
 def make_app():
     app = make_middleware(default_app(), {
@@ -143,12 +170,9 @@ def make_app():
     return app
 
 
-def main():
-    app = make_app()
-    run(app=app)
-
-
-def app_factory(global_config, **local_conf):
+def app_factory(global_config, tornado_port=8888, **local_conf):
+    tornado_port = int(tornado_port)
+    start_app(tornado_port)
     app = make_app()
     return app
 

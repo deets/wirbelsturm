@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 from json import dumps
 
@@ -15,16 +16,15 @@ from bottle import (
     TEMPLATE_PATH
     )
 
+import tornado.ioloop
+
 from tw.core.middleware import make_middleware
 import tw.mods.base
 
 from formencode import Invalid
-from formencode.validators import FancyValidator
 
 from tw.api import (
-    Widget,
     JSSource,
-    JSLink,
     )
 
 from tw.forms import (
@@ -36,34 +36,17 @@ from abl.jquery.core import jquery_js
 
 
 from .chat import CHAT
-from .tornado import start_app
+from .tornado import start_app, MainHandler
+from .widgets import (
+    UserList,
+    CentralStationWidget,
+    )
 
+from .validators import NotRegistered
 
 
 TEMPLATE_PATH.append(os.path.dirname(__file__))
 
-
-
-underscore_js = JSLink(modname=__name__,
-                       filename="underscore.js"
-                       )
-
-backbone_js = JSLink(modname=__name__,
-                     filename="backbone.js",
-                     javascript=[jquery_js, underscore_js],
-                     )
-
-
-class NotRegistered(FancyValidator):
-
-    def __init__(self, *args, **kwargs):
-        kwargs["not_empty"] = True
-        super(NotRegistered, self).__init__(*args, **kwargs)
-        
-
-    def validate_python(self, username, state):
-        if CHAT.has_user(username):
-            raise Invalid("User with that name already exists!", username, state)
         
 
 signup_form = TableForm(
@@ -73,36 +56,6 @@ signup_form = TableForm(
     )
 
 
-
-user_list_js = JSLink(modname=__name__,
-                      filename="userlist.js",
-                      javascript=[backbone_js]
-                      )
-                      
-                      
-
-class UserList(Widget):
-
-    template = "wirbelsturm.user_list"
-    engine_name = "genshi"
-
-    css_class = "user_list"
-
-    javascript = [user_list_js]
-
-
-    def update_params(self, d):
-        super(UserList, self).update_params(d)
-        user_list = dumps(d.value)
-        self.add_call("""
-        $(function() {
-          userlist.refresh(%(user_list)s);
-        }
-        );
-        """ % dict(user_list=user_list))
-        
-
-        
 user_list = UserList("user_list")
 
 
@@ -136,14 +89,9 @@ def chat(usercookie):
     return dict(user_list=user_list.render(CHAT.userinfo()))
 
 
-test_widget = Widget(
-    "test_widget",
-    javascript=[JSLink(modname=__name__,
-                       filename="test.js",
-                       javascript=[jquery_js])],
-    template = "<div id='$id'/>"
-    )
-    
+test_widget = CentralStationWidget("test_widget",
+                                   endpoint="/dispatch")
+
 
 @bottle.route("/ajax_test")
 @view("ajax_test")
@@ -151,15 +99,17 @@ def ajax_test():
     return dict(test_widget=test_widget.render())
 
 
-count = 0
 
-@route('/ajax_call')
-def ajax_call():
-    global count
-    count += 1
-    if not count % 10:
-        raise Exception()
-    return {'test' : count}
+
+@bottle.route("/trigger")
+def trigger():
+    loop = tornado.ioloop.IOLoop.instance()
+    loop.add_callback(MainHandler.run_callbacks)
+    return "Called"
+
+
+
+
 
 def make_app():
     app = make_middleware(default_app(), {

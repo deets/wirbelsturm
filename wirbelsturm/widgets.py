@@ -1,6 +1,8 @@
 from json import dumps
 from tw.api import (
     JSLink,
+    CSSLink,
+    JSSource,
     Widget,
     )
 
@@ -17,11 +19,6 @@ backbone_js = JSLink(modname="wirbelsturm",
                      javascript=[jquery_js, underscore_js],
                      )
 
-user_list_js = JSLink(modname="wirbelsturm",
-                      filename="javascript/userlist.js",
-                      javascript=[backbone_js]
-                      )
-                      
 
 centralstation_js = JSLink(modname="wirbelsturm",
                            filename="javascript/centralstation.js",
@@ -29,14 +26,53 @@ centralstation_js = JSLink(modname="wirbelsturm",
                            )
 
 
+
+def central_station(endpoint, start=True):
+
+    opts = dict(
+        endpoint=endpoint,
+        )
+    start = "true" if start else "false"
+
+    return JSSource("""
+    $(function() {
+      // one global
+      window.central_station = new CentralStation(%(opts)s);
+      if(%(start)s) {
+        window.central_station.start();
+      }
+    });
+    """ % dict(opts=dumps(opts), start=start),
+                    javascript = [centralstation_js]
+                    )
+
+
+my_central_station = central_station("/dispatch")
+
+
+reset_css = CSSLink(modname=__name__,
+                   filename="css/reset-min.css"
+                   )
+
+user_list_css = CSSLink(modname=__name__,
+                       filename="css/user_list.css",
+                       css=[reset_css]
+                       )
+
+
+user_list_js = JSLink(modname=__name__,
+                      filename="javascript/userlist.js",
+                      javascript=[backbone_js, my_central_station]
+                      )
+                      
+
 class UserList(Widget):
 
     template = "wirbelsturm.user_list"
     engine_name = "genshi"
-    
-
     css_class = "user_list"
 
+    css = [user_list_css]
     javascript = [user_list_js]
 
 
@@ -45,42 +81,37 @@ class UserList(Widget):
         user_list = dumps(d.value)
         self.add_call("""
         $(function() {
-          userlist.refresh(%(user_list)s);
+           var user_list =new UserList();
+           var ul_view = new UserListView({
+                      el : $("#%(id)s").get(0),
+                      model : user_list
+                      });
+           window.user_view = ul_view;
+           window.user_list = user_list;
         }
         );
-        """ % dict(user_list=user_list))
+        """ % dict(id=d.id))
         
 
         
-class CentralStationWidget(Widget):
+class TestWidget(Widget):
 
 
-    params = dict(
-        endpoint="""The url where the central-station connects to.""",
-        start="""If True (default), start the the dispatch immediatly."""
-        )
+    template = """<div xmlns:py='http://genshi.edgewall.org/' id='${id}' style='width:100px; height:20px; background-color:red;'/>"""
 
-    template = "<div xmlns:py='http://genhsi.edgewall.org/' py:strip='True'/>"
     engine_name = "genshi"
-    
-    endpoint = None
-    start = True
 
-    javascript = [centralstation_js]
+    javascript = [my_central_station]
     
     def update_params(self, d):
-        super(CentralStationWidget, self).update_params(d)
-        opts = dict(
-            endpoint=d.endpoint,
-            )
-        start = "true" if d.start else "false"
+        super(TestWidget, self).update_params(d)
+
         self.add_call("""
-           $(function() {
-             // one global
-             window.central_station = new CentralStation(%(opts)s);
-             if(%(start)s) {
-               window.central_station.start();
-             }
-           });
-        """ % dict(opts=dumps(opts),
-                   start=start))
+        $(function() {
+           $('#%s').click(
+              function() {
+                $.getJSON('/trigger');
+              }
+           );
+        })
+        """ % d.id)

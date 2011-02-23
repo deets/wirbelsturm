@@ -37,7 +37,7 @@ from .chat import CHAT
 from .tornado import start_app, CentralStation
 from .widgets import (
     UserList,
-    CentralStationWidget,
+    TestWidget,
     )
 
 from .validators import NotRegistered
@@ -87,25 +87,31 @@ def chat(usercookie):
     return dict(user_list=user_list.render(CHAT.userinfo()))
 
 
-test_widget = CentralStationWidget("test_widget",
-                                   endpoint="/dispatch")
+test_widget = TestWidget("test_widget")
 
 
 @bottle.route("/ajax_test")
 @view("ajax_test")
 def ajax_test():
-    return dict(test_widget=test_widget.render())
-
-
+    return dict(
+        test_widget=test_widget.render(),
+        user_list=user_list.render(),
+        )
 
 count = 0
 
 @bottle.route("/trigger")
 def trigger():
     global count
-    CentralStation.instance().post("test", {"count" : count})
+    id = "user_%i" % count
     count += 1
-    return "Called"
+    name = id.title()
+    CentralStation.instance().post("user_joined",
+                                   dict(id=id,
+                                        name=name,
+                                        )
+                                   )
+    return {"success" : True}
 
 
 

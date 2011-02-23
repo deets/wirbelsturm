@@ -20,7 +20,7 @@ class MessageInfo(object):
     def __json__(self):
         return dict(
             type=self.type,
-            message=self.payload)
+            payload=self.payload)
 
 
     def __str__(self):
@@ -59,7 +59,6 @@ class CentralStation(object):
             mi = MessageInfo(self, type, payload)
             self.messages.append((mi.id, mi))
             self.message_count += 1
-            print repr(mi)
         self.ioloop.add_callback(self.ioloop_callback)
         
 
@@ -113,6 +112,11 @@ class CentralStation(object):
 
 
     def ioloop_callback(self):
+        """
+        This callback is set by the post-method which
+        can be called in a different thread than the tornado-application,
+        but this callback will then be called from within the tornado-event-loop.
+        """
         with self.lock:
             messages = list(self.messages)
 

@@ -1,5 +1,6 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
+import time
 import bisect
 import threading
 from json import dumps
@@ -13,7 +14,7 @@ class MessageInfo(object):
     def __init__(self, dispatcher, type, payload):
         self.payload = payload
         self.type = type
-        self.id = dispatcher.message_id()
+        self.id = dispatcher.next_message_id()
         
 
 
@@ -31,6 +32,44 @@ class MessageInfo(object):
         return "<%s\n%r\n%s\n>" % (self.__class__.__name__,
                                    self.id,
                                    str(self))
+
+
+class TimeBasedIdProvider(object):
+
+    
+    def __init__(self, time=time.time):
+        self.time = time
+        self.current = self.time()
+        self.lock = threading.RLock()
+        
+
+    def next(self, last_id=None):
+        with self.lock:
+            if last_id is None:
+                candidate = self.time()
+                # ups, two message in succession - create an arbirtrary
+                # new id
+                if self.current >= candidate:
+                    candidate = self.next(self.current)
+                self.current = candidate
+            else:
+                # increment the current by the tiniest amount possible
+                # to yield a new number
+                def inc(n):
+                    o = n
+                    while n + o != n:
+                        a = o
+                        o /= 2
+                    return n + a
+                self.current = inc(self.current)
+            return self.current
+
+    def to_cookie(self, id_):
+        return repr(id_)
+
+
+    def from_cookie(self, cookie):
+        return float(cookie)
     
     
 class CentralStation(object):
@@ -44,10 +83,13 @@ class CentralStation(object):
         return cls._instance
 
 
-    def __init__(self, ioloop=None):
-        self.message_count = 0
+    def __init__(self, id_provider=None, ioloop=None):
+        if id_provider is None:
+            id_provider = TimeBasedIdProvider()
+        self.id_provider = id_provider
         self.messages = []
         self.listeners = []
+
         self.lock = threading.Lock()
         if ioloop is None:
             ioloop = tornado.ioloop.IOLoop.instance()
@@ -58,27 +100,30 @@ class CentralStation(object):
         with self.lock:
             mi = MessageInfo(self, type, payload)
             self.messages.append((mi.id, mi))
-            self.message_count += 1
         self.ioloop.add_callback(self.ioloop_callback)
         
 
-    def message_id(self):
-        return self.message_count
+    def next_message_id(self, last_id=None):
+        return self.id_provider.next(last_id)
+
+
+    def current_message_id(self):
+        return self.id_provider.current
     
 
     def listen(self, handler, message_id=None):
         with self.lock:
             if message_id is None:
-                message_id = self.message_id()
+                message_id = self.current_message_id()
             self.listeners.append((message_id, handler))
 
 
     def mid_to_cookie(self, mid):
-        return str(mid)
+        return self.id_provider.to_cookie(mid)
 
 
     def cookie_to_mid(self, cookie):
-        return int(cookie)
+        return self.id_provider.from_cookie(cookie)
     
 
     def create_handler(self):
@@ -90,16 +135,17 @@ class CentralStation(object):
 
             @tornado.web.asynchronous
             def get(self):
-                lmid = self.get_cookie(central_station.LATEST_MESSAGE_ID_COOKIE)
-                if lmid:
-                    lmid = central_station.cookie_to_mid(lmid)
-                else:
-                    lmid = None
-                central_station.listen(self, lmid)
+                last_message_id = None
+                cookie = self.get_cookie(central_station.LATEST_MESSAGE_ID_COOKIE)
+                if cookie:
+                    last_message_id = central_station.cookie_to_mid(cookie)
+                central_station.listen(self, last_message_id)
 
 
             def dispatch_messages(self, messages):
-                last_mid = messages[-1].id
+                # we take the next message-id here, because the bisect
+                # in the callback works as greater-equal, not strict greater
+                last_mid = central_station.next_message_id(messages[-1].id)
                 data = dumps({"messages" : [m.__json__() for m in messages]})
                 self.set_header("Content-Type", "application/json")
                 self.set_cookie(central_station.LATEST_MESSAGE_ID_COOKIE,

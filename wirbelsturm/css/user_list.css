@@ -1,5 +1,35 @@
 
 ul.user_list 
 { 
-  background-color: green;
-}
+  font-family: Arial,sans-serif;
+  width: 200px;
+  padding: 8px;
+  -moz-border-radius: 8px; /* FireFox 1+ */
+  -webkit-border-radius: 8px; /* Safari 3+, Chrome */
+  border-radius: 8px; /* Opera 10.5, IE 9 */
+  /* FireFox 3.6 */
+  background-image: -moz-linear-gradient(top, #eef, #aad);
+  /* Safari4+, Chrome */
+  background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #eef),color-stop(1, #aad));
+  /* IE6,IE7 */
+  filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#eef', endColorstr='#aad');
+  /* IE8 */
+  ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#eef', endColorstr='#aad')";
+  }
+
+ul.user_list li 
+{ 
+  width: 88%;
+  padding: 4px 4px 4px 20px;
+  margin-bottom: 4px;
+  -moz-border-radius: 4px; /* FireFox 1+ */
+  background-image: -moz-linear-gradient(top, #fee, #daa);
+  transition: background-color 1s linear;
+  -moz-transition: background-color 1s linear;    /* FF3.7+ */
+  }
+
+ul.user_list li.typing
+{ 
+  background-image: -moz-linear-gradient(top, #efe, #ada);
+  }
+      

@@ -61,10 +61,10 @@ user_list_css = CSSLink(modname=__name__,
 
 
 user_list_js = JSLink(modname=__name__,
-                      filename="javascript/userlist.js",
+                      filename="javascript/user_list.js",
                       javascript=[backbone_js, my_central_station]
                       )
-                      
+
 
 class UserList(Widget):
 
@@ -81,15 +81,8 @@ class UserList(Widget):
         user_list = dumps(d.value)
         self.add_call("""
         $(function() {
-           var user_list =new UserList();
-           var ul_view = new UserListView({
-                      el : $("#%(id)s").get(0),
-                      model : user_list
-                      });
-           window.user_view = ul_view;
-           window.user_list = user_list;
-        }
-        );
+          UserList.setup_user_list("#%(id)s");
+        });
         """ % dict(id=d.id))
         
 

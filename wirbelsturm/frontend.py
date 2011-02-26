@@ -75,49 +75,19 @@ def register():
         return index()
 
     userinfo = CHAT.register_user(value["name"])
-    redirect("/chat/%s" % userinfo.cookie)
+    CentralStation.instance().post("user_joined", userinfo.__json__())
+    response.set_cookie("ChatID", userinfo.cookie)
+    redirect("/chat")
 
 
 
-@bottle.route('/chat/:usercookie')
+@bottle.route('/chat')
 @view("chat")
-def chat(usercookie):
-    js = JSSource("""
-    $(document).ready(function() {
-    });
-    """ % dict(cookie=usercookie), javascript=[jquery_js]).inject()
-    return dict(user_list=user_list.render(CHAT.userinfo()))
-
-
-test_widget = TestWidget("test_widget")
-
-
-@bottle.route("/ajax_test")
-@view("ajax_test")
-def ajax_test():
+def chat():
     return dict(
-        test_widget=test_widget.render(),
-        user_list=user_list.render(),
+        user_list=user_list.render(CHAT.userinfo()),
         message_entry=message_entry.render(),
         )
-
-count = 0
-
-@bottle.route("/trigger")
-def trigger():
-    global count
-    id = "user_%i" % count
-    count += 1
-    name = id.title()
-    CentralStation.instance().post("user_joined",
-                                   dict(id=id,
-                                        name=name,
-                                        )
-                                   )
-    return {"success" : True}
-
-
-
 
 
 def make_app():

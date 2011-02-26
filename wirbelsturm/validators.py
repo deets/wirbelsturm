@@ -1,5 +1,6 @@
 from formencode import Invalid
 from formencode.validators import FancyValidator
+from .chat import CHAT
 
 class NotRegistered(FancyValidator):
 

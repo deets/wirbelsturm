@@ -27,7 +27,7 @@ UserList = Backbone.Collection.extend(
     // class properties
     {
         // site-wide initialization
-        setup_user_list : function(list_id) {
+        setup_user_list : function(list_id, user_data) {
             var user_list =new UserList();
             var ul_view = new UserListView({
                                                el : $(list_id).get(0),
@@ -35,12 +35,11 @@ UserList = Backbone.Collection.extend(
                                            });
             window.user_view = ul_view;
             window.user_list = user_list;
-            // test setup
-            user_list.add(new User({"id" : "pete", "name" : "Peter"}));
-            user_list.add(new User({"id" : "heiner", "name" : "Heiner"}));
-            karl = new User({"id" : "karl", "name" : "Karl"});
-            user_list.add(karl);
-            karl.set({"typing" : true});
+	    $.each(user_data, function(_, ud)
+		   {
+		       user_list.add(new User(ud));
+		   }
+		  );
         }
     }
 );
@@ -59,6 +58,8 @@ UserListView = Backbone.View.extend(
         },
 
         add_user : function(user) {
+	    if(user.id in this.user2el)
+		return;
             var li = $("<li/>");
             li.text(user.get("name"));
             $(this.el).append(li);

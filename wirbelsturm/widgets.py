@@ -86,9 +86,10 @@ class UserList(Widget):
         user_list = dumps(d.value)
         self.add_call("""
         $(function() {
-          UserList.setup_user_list("#%(id)s");
+          UserList.setup_user_list("#%(id)s", %(user_list)s);
         });
-        """ % dict(id=d.id))
+        """ % dict(id=d.id, 
+               user_list=user_list))
 
 
 message_entry_js = JSLink(modname=__name__,
@@ -112,6 +113,11 @@ class MessageEntry(Widget):
     css = [message_entry_css]
     javascript = [message_entry_js]
 
+    params = dict(
+        endpoint="The chat messages/status enpoint",
+        )
+
+    endpoint = "/chat_dispatch"
 
     def update_params(self, d):
         super(MessageEntry, self).update_params(d)
@@ -119,8 +125,11 @@ class MessageEntry(Widget):
                       $(function() {
                         var el = $('#%(id)s').get(0);
                         window.message_entry_view = new MessageEntryView({ el : el});
+                        window.hub = new ChatHub(window.message_entry_view,
+                                                 "%(endpoint)s"
+                                                 );
                       });
-                      """ % dict(id=d.id))
+                      """ % d)
     
     
 class TestWidget(Widget):

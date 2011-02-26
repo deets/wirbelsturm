@@ -8,6 +8,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 
+from .chat import CHAT
 
 class MessageInfo(object):
 
@@ -178,9 +179,28 @@ class CentralStation(object):
                 
         self.listeners[:] = new_listeners
         
+
+class ChatHandler(tornado.web.RequestHandler):
+
+    def post(self):
+        arguments = self.request.arguments
+        usercookie = self.get_argument("usercookie")
+        userinfo = CHAT[usercookie]
+        import pdb;pdb.set_trace()
+        if "typing" in arguments:
+            userinfo.typing(True if self.get_argument("typing") == "true" else False)
+        if "message" in arguments:
+            userinfo.send_message(arguments["message"])
+
+
+        data = dumps({"status" : "ok"})
+        self.set_header("Content-Type", "application/json")
+        self.write(data)
+
         
 
 application = tornado.web.Application([
+    (r"/chat_dispatch", ChatHandler),
     (r"/dispatch", CentralStation.instance().create_handler()),
 ])
 

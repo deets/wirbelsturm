@@ -7,6 +7,12 @@ div.message_entry
   background-color: blue;
 }
 
+
+div.message_entry.typing 
+{ 
+  background-color: black;
+  }
+
 div.message_entry textarea 
 {
   width: 400px;

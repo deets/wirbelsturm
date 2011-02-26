@@ -28,7 +28,12 @@ centralstation_js = JSLink(modname="wirbelsturm",
 
 
 def central_station(endpoint, start=True):
-
+    """
+    This function creates a JSSource widget which
+    should be declared as dependency for all widgets
+    that have java-script that relies on the existence
+    of a "central_station".
+    """
     opts = dict(
         endpoint=endpoint,
         )
@@ -84,9 +89,40 @@ class UserList(Widget):
           UserList.setup_user_list("#%(id)s");
         });
         """ % dict(id=d.id))
-        
 
-        
+
+message_entry_js = JSLink(modname=__name__,
+                      filename="javascript/message_entry.js",
+                      javascript=[backbone_js, my_central_station]
+                      )
+
+message_entry_css = CSSLink(modname=__name__,
+                            filename="css/message_entry.css"
+                            )
+
+
+class MessageEntry(Widget):
+
+    template = "wirbelsturm.message_entry"
+
+    engine_name = "genshi"
+
+    css_class = "message_entry"
+
+    css = [message_entry_css]
+    javascript = [message_entry_js]
+
+
+    def update_params(self, d):
+        super(MessageEntry, self).update_params(d)
+        self.add_call("""
+                      $(function() {
+                        var el = $('#%(id)s').get(0);
+                        window.message_entry_view = new MessageEntryView({ el : el});
+                      });
+                      """ % dict(id=d.id))
+    
+    
 class TestWidget(Widget):
 
 

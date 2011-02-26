@@ -38,6 +38,7 @@ from .tornado import start_app, CentralStation
 from .widgets import (
     UserList,
     TestWidget,
+    MessageEntry,
     )
 
 from .validators import NotRegistered
@@ -55,6 +56,7 @@ signup_form = TableForm(
 
 
 user_list = UserList("user_list")
+message_entry = MessageEntry("message_entry")
 
 
 @bottle.route('/')
@@ -96,6 +98,7 @@ def ajax_test():
     return dict(
         test_widget=test_widget.render(),
         user_list=user_list.render(),
+        message_entry=message_entry.render(),
         )
 
 count = 0

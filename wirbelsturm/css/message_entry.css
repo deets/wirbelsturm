@@ -1,0 +1,14 @@
+div.message_entry
+{ 
+  width:400px;
+  height:80px;
+  padding:8px;
+  -moz-border-radius: 8px; /* FireFox 1+ */
+  background-color: blue;
+}
+
+div.message_entry textarea 
+{
+  width: 400px;
+  height: 80px;
+  }

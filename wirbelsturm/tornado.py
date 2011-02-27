@@ -19,7 +19,7 @@ class ChatHandler(tornado.web.RequestHandler):
         if "typing" in arguments:
             userinfo.typing(True if self.get_argument("typing") == "true" else False)
         if "message" in arguments:
-            userinfo.send_message(arguments["message"])
+            userinfo.send_message(self.get_argument("message"))
 
 
         data = dumps({"status" : "ok"})

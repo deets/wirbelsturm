@@ -39,6 +39,7 @@ from .widgets import (
     UserList,
     TestWidget,
     MessageEntry,
+    MessageList,
     )
 
 from .validators import NotRegistered
@@ -57,6 +58,7 @@ signup_form = TableForm(
 
 user_list = UserList("user_list")
 message_entry = MessageEntry("message_entry")
+message_list = MessageList("message_list")
 
 
 @bottle.route('/')
@@ -87,6 +89,7 @@ def chat(usercookie):
 
     return dict(
         user_list=user_list.render(CHAT.userinfos()),
+        message_list=message_list.render(),
         message_entry=message_entry.render(usercookie=usercookie),
         )
 

@@ -3,6 +3,7 @@
   </head>
   <body>
     {{!user_list}}
+    {{!message_list}}
     {{!message_entry}}
   </body>
 </html>

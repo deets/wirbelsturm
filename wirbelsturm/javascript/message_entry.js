@@ -8,11 +8,10 @@ MessageEntryView = Backbone.View.extend(
 
         initialize : function() {
             _.bindAll(this, "key_down", "message", "clear", "typing_started", 
-		     "typing_ended", "test", "cancel_typing_timer");
+		     "typing_ended", "cancel_typing_timer");
 	     this.textarea = this.$("textarea");
 	     this.textarea.keydown(this.key_down);
 	     this.typing_timer = null;
-	     this.bind("typing", this.test);
 	 },
 
 	 key_down : function(event) {
@@ -60,14 +59,6 @@ MessageEntryView = Backbone.View.extend(
 	    if(this.typing_timer != null) {
 		clearTimeout(this.typing_timer);
 		this.typing_timer = null;
-	    }
-	},
-
-	test : function(typing) {
-	    if(typing) {
-		$(this.el).addClass("typing");
-	    } else {
-		$(this.el).removeClass("typing");
 	    }
 	}
     }

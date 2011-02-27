@@ -1,0 +1,18 @@
+div.message_list 
+{ 
+  width: 400px;
+  height:400px;
+  padding:8px;
+  -moz-border-radius: 8px; /* FireFox 1+ */
+  background-color: green;  
+}
+
+div.message_list li
+{ 
+  background-color: #aaffee;
+  margin-bottom: 4px;
+  padding:2px;
+  -moz-border-radius-topright: 4px; /* FireFox 1+ */
+  -moz-border-radius-bottomright: 4px; /* FireFox 1+ */
+   -moz-border-radius-bottomleft: 4px; /* FireFox 1+ */
+}

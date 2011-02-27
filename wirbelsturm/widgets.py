@@ -133,6 +133,39 @@ class MessageEntry(Widget):
                       });
                       """ % d)
     
+
+
+message_list_js = JSLink(modname=__name__,
+                      filename="javascript/message_list.js",
+                      javascript=[backbone_js, my_central_station]
+                      )
+
+message_list_css = CSSLink(modname=__name__,
+                            filename="css/message_list.css"
+                            )
+
+class MessageList(Widget):
+
+    template = "wirbelsturm.message_list"
+
+    engine_name = "genshi"
+
+    css_class = "message_list"
+
+    css = [message_list_css]
+    javascript = [message_list_js]
+
+
+    def update_params(self, d):
+        super(MessageList, self).update_params(d)
+        self.add_call("""
+                      $(function() {
+                        var el = $('#%(id)s').get(0);
+                        window.message_list_view = new MessageListView({ el : el});
+                      });
+                      """ % d)
+    
+    
     
 class TestWidget(Widget):
 

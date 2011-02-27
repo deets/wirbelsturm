@@ -114,6 +114,7 @@ class MessageEntry(Widget):
     javascript = [message_entry_js]
 
     params = dict(
+        usercookie="The secret to identify the user",
         endpoint="The chat messages/status enpoint",
         )
 
@@ -126,7 +127,8 @@ class MessageEntry(Widget):
                         var el = $('#%(id)s').get(0);
                         window.message_entry_view = new MessageEntryView({ el : el});
                         window.hub = new ChatHub(window.message_entry_view,
-                                                 "%(endpoint)s"
+                                                 "%(endpoint)s",
+                                                 "%(usercookie)s" 
                                                  );
                       });
                       """ % d)

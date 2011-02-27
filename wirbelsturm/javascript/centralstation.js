@@ -29,7 +29,7 @@ var CentralStation = Backbone.Model.extend(
 		$.each(data.messages, 
 		       function(__, message) {
 			   console.log(message);
-			   self.trigger(message.type, message.payload);
+			   self.trigger(message.scope, message.operation, message.payload);
 		       }
 		      );
 	    }

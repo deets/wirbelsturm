@@ -15,14 +15,24 @@ UserList = Backbone.Collection.extend(
     {
         model : User,
         initialize : function() {
-            _.bindAll(this, "add");
+            _.bindAll(this, "add", "dispatch");
             var self = this;
-            central_station.bind("user_joined", 
-                                 function(user_data) {
-                                     var user = new User(user_data);
-                                     self.add(user);
-                                 });
-        }
+            central_station.bind("user_list", this.dispatch);
+        },
+
+	dispatch : function(operation, payload) {
+	    switch(operation) {
+	    case "add":
+		this.add(new this.model(payload));
+		break;
+	    case "modify":
+		var id = payload.id;
+		delete payload.id;
+		var m = this.get(id);
+		m.set(payload);
+		break;
+	    }
+	}
     },
     // class properties
     {

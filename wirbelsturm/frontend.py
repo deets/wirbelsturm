@@ -63,8 +63,7 @@ message_entry = MessageEntry("message_entry")
 @view("index")
 def index():
     return dict(signup_form=signup_form.render(),
-                user_list=user_list.render(CHAT.userinfo()))
-
+                user_list=user_list.render(CHAT.userinfos()))
 
 
 @bottle.route('/register', method="POST")
@@ -75,18 +74,20 @@ def register():
         return index()
 
     userinfo = CHAT.register_user(value["name"])
-    CentralStation.instance().post("user_joined", userinfo.__json__())
-    response.set_cookie("ChatID", userinfo.cookie)
-    redirect("/chat")
+    redirect("/chat/" + userinfo.cookie)
 
 
-
-@bottle.route('/chat')
+@bottle.route('/chat/:usercookie')
 @view("chat")
-def chat():
+def chat(usercookie):
+    try:
+        ui = CHAT[usercookie]
+    except KeyError:
+        redirect("/")
+
     return dict(
-        user_list=user_list.render(CHAT.userinfo()),
-        message_entry=message_entry.render(),
+        user_list=user_list.render(CHAT.userinfos()),
+        message_entry=message_entry.render(usercookie=usercookie),
         )
 
 

@@ -3,6 +3,8 @@ from hashlib import md5
 
 from abl.util import Bunch
 
+from .centralstation import CentralStation
+
 class UserInfo(object):
 
     def __init__(self, chat_core, cookie, username):
@@ -10,11 +12,13 @@ class UserInfo(object):
         self.cookie = cookie
         self.username = username
 
+
     def send_message(self, message):
         self.chat_core.chat(self.username, message)
 
+
     def typing(self, typing):
-        pass
+        self.chat_core.typing(self.username, typing)
 
 
     def __json__(self):
@@ -27,9 +31,7 @@ class ChatCore(object):
     def __init__(self):
         self.users = {}
         self.cookie2user = {}
-        self.messages = []
-        self.mid = 0
-        
+
 
     def has_user(self, username):
         return username in self.users
@@ -38,21 +40,39 @@ class ChatCore(object):
     def register_user(self, username):
         assert not self.has_user(username)
         cookie = md5(username).hexdigest()
-        self.users[username] = UserInfo(
+        ui = UserInfo(
             self,
             cookie=cookie,
             username=username,
             )
+        self.users[username] = ui
         self.cookie2user[cookie] = username
-        return self.users[username]
-    
+        CentralStation.instance().post(
+            "user_list",
+            "add",
+            ui.__json__(),
+            )
+        return ui
+
+    def typing(self, username, typing):
+        CentralStation.instance().post(
+            "user_list",
+            "modify",
+            dict(id=username,
+                 typing=typing,
+                 )
+            )
+        
 
     def chat(self, username, message):
-        self.mid += 1
-        self.messages.append((self.mid, username, messages))
+        CentralStation.instance().post("message_list",
+                                       "add",
+                                       dict(username=username, 
+                                            message=message))
 
 
-    def userinfo(self):
+
+    def userinfos(self):
         return list(ui.__json__() for ui in sorted(self.users.values(), key=lambda ui: ui.username))
 
 

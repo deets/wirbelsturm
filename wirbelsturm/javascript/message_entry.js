@@ -74,15 +74,6 @@ MessageEntryView = Backbone.View.extend(
 );
 
 
-function get_cookie ( cookie_name )
-{
-  var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
-
-  if ( results )
-    return ( unescape ( results[2] ) );
-  else
-    return null;
-}
 
 ChatHub = function() 
 {
@@ -91,13 +82,13 @@ ChatHub = function()
 
 _.extend(ChatHub.prototype,
 	 {
-	     initialize: function(mev, endpoint) {
+	     initialize: function(mev, endpoint, usercookie) {
 		 _.bindAll(this, "typing", "send_message", "post");
 		 this.endpoint = endpoint;
+		 this.usercookie = usercookie;
 		 this._typing = false;
 		 mev.bind("typing", this.typing);
 		 mev.bind("send_message", this.send_message);
-		 this.usercookie = get_cookie("ChatID");
 	     },
 	     
 	     typing : function(typing) {

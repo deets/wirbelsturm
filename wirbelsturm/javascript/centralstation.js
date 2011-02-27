@@ -1,10 +1,15 @@
 var CentralStation = Backbone.Model.extend(
     {
+	LATEST_MESSAGE_ID : "Latest-Message-ID",
+
 	initialize : function() {
-	    _.bindAll(this, "start", "dispatch", "error");
+	    _.bindAll(this, "start", "dispatch", "error", "ajax_send",
+		     "ajax_complete");
 	    if(this.get("endpoint") == null) {
 		throw new Error("Now endpoint given!");
 	    }
+	    $("body").ajaxSend(this.ajax_send);
+	    $("body").ajaxComplete(this.ajax_complete);
 	},
 
 	start : function() {
@@ -41,9 +46,27 @@ var CentralStation = Backbone.Model.extend(
 	    }
 	},
 
+	ajax_send : function(event, req, options) {
+	    if(options.url !== this.get("dispatch")) {
+		return;
+	    }
+	    if(this.get("latest_message_id") != null) {
+		req.setRequestHeader(this.LATEST_MESSAGE_ID, this.get("latest_message_id"));
+	    }
+	},
+
+	ajax_complete : function(event, req, options) {
+	    if(options.url !== this.get("dispatch")) {
+		return;
+	    }
+	    this.set({"latest_message_id"
+		      : req.getResponseHeader(this.LATEST_MESSAGE_ID )});
+	},
+
 	defaults : {
 	    state : "new",
-	    endpoint : null
+	    endpoint : null,
+	    latest_message_id : null
 	}
     }
 );

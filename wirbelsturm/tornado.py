@@ -137,7 +137,7 @@ class CentralStation(object):
             @tornado.web.asynchronous
             def get(self):
                 last_message_id = None
-                cookie = self.get_cookie(central_station.LATEST_MESSAGE_ID_COOKIE)
+                cookie = self.request.headers.get(central_station.LATEST_MESSAGE_ID_COOKIE)
                 if cookie:
                     last_message_id = central_station.cookie_to_mid(cookie)
                 central_station.listen(self, last_message_id)
@@ -149,7 +149,7 @@ class CentralStation(object):
                 last_mid = central_station.next_message_id(messages[-1].id)
                 data = dumps({"messages" : [m.__json__() for m in messages]})
                 self.set_header("Content-Type", "application/json")
-                self.set_cookie(central_station.LATEST_MESSAGE_ID_COOKIE,
+                self.set_header(central_station.LATEST_MESSAGE_ID_COOKIE,
                                 central_station.mid_to_cookie(last_mid))
                 self.write(data)
                 self.finish()

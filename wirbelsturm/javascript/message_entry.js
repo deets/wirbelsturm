@@ -15,7 +15,6 @@ MessageEntryView = Backbone.View.extend(
 	 },
 
 	 key_down : function(event) {
-	     console.log(event);
 	     var kc = event.keyCode;
 	     var message = null;
 	     switch(kc) {
@@ -83,7 +82,6 @@ _.extend(ChatHub.prototype,
 	     },
 	     
 	     typing : function(typing) {
-		 console.log("typing:" + typing);
 		 if(this._typing != typing) {
 		     this.post({"typing" : typing});
 		 }
@@ -91,7 +89,6 @@ _.extend(ChatHub.prototype,
 	     },
 	     
 	     send_message : function(message) {
-		 console.log("send_message:" + message);
 		 this.post({"message" : message});
 	     },
 

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, with_statement
 
+import logging
 import threading
 from json import dumps
 
@@ -9,6 +10,8 @@ import tornado.web
 
 from .chat import CHAT
 from .centralstation import CentralStation        
+
+logger = logging.getLogger(__name__)
 
 class ChatHandler(tornado.web.RequestHandler):
 
@@ -30,7 +33,7 @@ class ChatHandler(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r"/chat_dispatch", ChatHandler),
-    (r"/dispatch", CentralStation.instance().create_handler()),
+    (r"/dispatch/.*", CentralStation.instance().create_handler()),
 ])
 
 

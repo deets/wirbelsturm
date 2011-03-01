@@ -1,10 +1,14 @@
 from __future__ import absolute_import
 import time
+import logging
 import bisect
 import threading
 from json import dumps
+from pprint import pformat
 
 import tornado.web
+
+logger = logging.getLogger(__name__)
 
 class MessageInfo(object):
 
@@ -135,10 +139,14 @@ class CentralStation(object):
 
             @tornado.web.asynchronous
             def get(self):
+                logger.debug("/dispatch called")
                 last_message_id = None
                 cookie = self.request.headers.get(self.LATEST_MESSAGE_ID_COOKIE)
                 if cookie:
                     last_message_id = central_station.cookie_to_mid(cookie)
+                    logger.debug("found header")
+           
+                logger.debug("waiting for messages, lmid: %r", last_message_id)
                 central_station.listen(self, last_message_id)
 
 
@@ -146,11 +154,14 @@ class CentralStation(object):
                 # we take the next message-id here, because the bisect
                 # in the callback works as greater-equal, not strict greater
                 last_mid = central_station.next_message_id(messages[-1].id)
+                logger.debug("dispatch_messages, future lmid: %r", last_mid)
                 data = dumps({"messages" : [m.__json__() for m in messages]})
                 self.set_header("Content-Type", "application/json")
+                lmid = central_station.mid_to_cookie(last_mid)
                 self.set_header(self.LATEST_MESSAGE_ID_COOKIE,
-                                central_station.mid_to_cookie(last_mid))
+                                lmid)
                 self.write(data)
+                logger.debug("data: %r", data)
                 self.finish()
 
                 
@@ -163,17 +174,23 @@ class CentralStation(object):
         can be called in a different thread than the tornado-application,
         but this callback will then be called from within the tornado-event-loop.
         """
+        logger.debug("ioloop_callback")
         with self.lock:
             messages = list(self.messages)
 
+        logger.debug(repr(messages))
         new_listeners = []
         for mid, listener in self.listeners:
+            logger.debug("listener, waiting for lmid: %r", mid)
             offset = bisect.bisect(messages, (mid, None))
             if messages[offset:]:
+                logger.debug("offset: %i", offset)
                 listener.dispatch_messages([m for _, m in messages[offset:]])
             else:
                 # we didn't yet have enough messages to
                 # dispatch, so we re-append this bugger.
+                logger.debug("re-appended listener")
                 new_listeners.append((mid, listener))
                 
         self.listeners[:] = new_listeners
+        logger.debug("remaining listeners: %r", self.listeners)

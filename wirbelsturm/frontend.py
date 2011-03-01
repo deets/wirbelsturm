@@ -5,6 +5,8 @@ from json import dumps
 import bottle
 bottle.debug(True)
 
+import logging
+
 from bottle import (
     run,
     request,
@@ -47,6 +49,8 @@ from .validators import NotRegistered
 
 TEMPLATE_PATH.append(os.path.dirname(__file__))
 
+
+logger = logging.getLogger(__name__)
         
 
 signup_form = TableForm(
@@ -86,7 +90,6 @@ def chat(usercookie):
         ui = CHAT[usercookie]
     except KeyError:
         redirect("/")
-
     return dict(
         user_list=user_list.render(CHAT.userinfos()),
         message_list=message_list.render(),

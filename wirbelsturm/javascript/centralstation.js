@@ -13,8 +13,7 @@ var CentralStation = Backbone.Model.extend(
 	},
 
 	start : function() {
-	    console.log("start");
-	    var d = $.getJSON(this.get("endpoint")).
+	    var d = $.getJSON(this.get("endpoint") + "/" + new Date().getTime()).
 		success(this.dispatch).
 		error(this.error);
 	    if(this.get("state") != "running") {
@@ -47,20 +46,27 @@ var CentralStation = Backbone.Model.extend(
 	},
 
 	ajax_send : function(event, req, options) {
-	    if(options.url !== this.get("dispatch")) {
+	    var ep = this.get("endpoint");
+	    if(options.url.substring(0, ep.length) !== ep) {
 		return;
 	    }
-	    if(this.get("latest_message_id") != null) {
+	    console.log("ajax_send");
+	    var lmid = this.get("latest_message_id");
+	    console.log("ajax_send lmid:" + lmid);
+	    if(lmid != null) {
 		req.setRequestHeader(this.LATEST_MESSAGE_ID, this.get("latest_message_id"));
 	    }
 	},
 
 	ajax_complete : function(event, req, options) {
-	    if(options.url !== this.get("dispatch")) {
+	    var ep = this.get("endpoint");
+	    if(options.url.substring(0, ep.length) !== ep) {
 		return;
 	    }
-	    this.set({"latest_message_id"
-		      : req.getResponseHeader(this.LATEST_MESSAGE_ID )});
+	    console.log("ajax_complete");
+	    var lmid = req.getResponseHeader(this.LATEST_MESSAGE_ID);
+	    console.log("lmid: " + lmid);
+	    this.set({"latest_message_id" : lmid});
 	},
 
 	defaults : {

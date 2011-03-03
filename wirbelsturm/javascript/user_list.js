@@ -59,12 +59,13 @@ UserList = Backbone.Collection.extend(
 UserListView = Backbone.View.extend( 
     {
 
-        tagName : "ul",
+        tagName : "div",
         className : "user_list",
         initialize : function() {
             _.bindAll(this, "render", "add_user", "toggle_typing");
             this.model.bind("add", this.add_user);
             this.user2el = {};            
+	    this.ul = this.$("ul.entries");
         },
 
         add_user : function(user) {
@@ -72,7 +73,7 @@ UserListView = Backbone.View.extend(
 		return;
             var li = $("<li/>");
             li.text(user.get("name"));
-            $(this.el).append(li);
+            $(this.ul).append(li);
             this.user2el[user.id] = li;
             user.bind("change:typing", this.toggle_typing);
         },

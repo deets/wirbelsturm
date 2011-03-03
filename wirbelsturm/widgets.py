@@ -1,12 +1,22 @@
+from __future__ import absolute_import
+
 from json import dumps
 from tw.api import (
     JSLink,
     CSSLink,
     JSSource,
     Widget,
+    WidgetsList,
+    )
+
+from tw.forms import (
+    TableForm,
+    TextField,
     )
 
 from abl.jquery.core import jquery_js
+
+from .validators import NotRegistered
 
 
 
@@ -55,13 +65,38 @@ def central_station(endpoint, start=True):
 my_central_station = central_station("/dispatch")
 
 
+
+
+
+
 reset_css = CSSLink(modname=__name__,
                    filename="css/reset-min.css"
                    )
 
+
+super_chat_css = CSSLink(modname=__name__,
+                         filename="css/super_chat.css",
+                         css=[reset_css]
+)
+
+
+
+class SignupForm(TableForm):
+
+    css = [CSSLink(modname=__name__,
+                         filename="css/signup_form.css",
+                         css=[super_chat_css])]
+
+    class fields(WidgetsList):
+        name = TextField("name", validator=NotRegistered())
+
+    submit_text = "Join"
+
+
+
 user_list_css = CSSLink(modname=__name__,
                        filename="css/user_list.css",
-                       css=[reset_css]
+                       css=[super_chat_css]
                        )
 
 
@@ -98,7 +133,8 @@ message_entry_js = JSLink(modname=__name__,
                       )
 
 message_entry_css = CSSLink(modname=__name__,
-                            filename="css/message_entry.css"
+                            filename="css/message_entry.css",
+                            css=[super_chat_css],
                             )
 
 
@@ -141,7 +177,8 @@ message_list_js = JSLink(modname=__name__,
                       )
 
 message_list_css = CSSLink(modname=__name__,
-                            filename="css/message_list.css"
+                            filename="css/message_list.css",
+                            css=[super_chat_css],
                             )
 
 class MessageList(Widget):

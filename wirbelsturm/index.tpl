@@ -2,8 +2,14 @@
   <head>
   </head>
   <body>
-  <h1>Welcome to SuperChat</h1>
-    {{!signup_form}}
-    {{!user_list}}
+    <div id="content">
+      <h1>SuperChat</h1>
+      <div id="left">
+	{{!signup_form}}
+      </div>
+      <div id="right">
+	{{!user_list}}
+      </div>
+    </div>
   </body>
 </html>

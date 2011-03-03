@@ -13,6 +13,7 @@ MessageListView = Backbone.View.extend(
 	    var li = $("<li>");
 	    li.text(payload.message);
 	    this.list.append(li);
+	    $(this.list).animate({ scrollTop: $(this.list).attr("scrollHeight") - $(this.list).height() }, 500);
 	}
     }
 );

@@ -1,10 +1,18 @@
 div.message_list 
 { 
-  width: 400px;
+  width: 384px;
   height:400px;
   padding:8px;
   -moz-border-radius: 8px; /* FireFox 1+ */
   background-color: green;  
+  margin-bottom: 10px;
+}
+
+div.message_list ul
+{  
+  width: 384px;
+  height:400px;
+  overflow: hidden;
 }
 
 div.message_list li

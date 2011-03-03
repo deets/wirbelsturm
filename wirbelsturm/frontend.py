@@ -27,10 +27,6 @@ from tw.api import (
     JSSource,
     )
 
-from tw.forms import (
-    TableForm,
-    TextField,
-    )
 
 from abl.jquery.core import jquery_js
 
@@ -38,13 +34,12 @@ from abl.jquery.core import jquery_js
 from .chat import CHAT
 from .tornado import start_app, CentralStation
 from .widgets import (
+    SignupForm,
     UserList,
     TestWidget,
     MessageEntry,
     MessageList,
     )
-
-from .validators import NotRegistered
 
 
 TEMPLATE_PATH.append(os.path.dirname(__file__))
@@ -53,11 +48,7 @@ TEMPLATE_PATH.append(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
         
 
-signup_form = TableForm(
-    "signup_form",
-    fields=[TextField("name", validator=NotRegistered())],
-    action="/register"
-    )
+signup_form = SignupForm("signup_form", action="/register")
 
 
 user_list = UserList("user_list")

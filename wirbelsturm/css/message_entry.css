@@ -1,10 +1,10 @@
 div.message_entry
 { 
-  width:400px;
+  width:384px;
   height:80px;
   padding:8px;
   -moz-border-radius: 8px; /* FireFox 1+ */
-  background-color: blue;
+  background-color: lightgreen;
 }
 
 
@@ -15,6 +15,6 @@ div.message_entry.typing
 
 div.message_entry textarea 
 {
-  width: 400px;
+  width: 384px;
   height: 80px;
   }

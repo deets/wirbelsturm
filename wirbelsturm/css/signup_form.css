@@ -1,0 +1,27 @@
+form#signup_form 
+{  
+  color:white;
+  -moz-border-radius: 8px; /* FireFox 1+ */
+  -webkit-border-radius: 8px; /* Safari 3+, Chrome */
+  border-radius: 8px; /* Opera 10.5, IE 9 */
+  background-color: green;
+  padding: 20px;
+  width: 360px;
+}
+
+form#signup_form .fieldlabel
+{ 
+  color:white;
+}
+
+form#signup_form td
+{ 
+  vertical-align: top;
+}
+
+form#signup_form td.fieldcol
+{ 
+  text-align: right;
+  width:50%;
+  padding-bottom: 20px;
+}

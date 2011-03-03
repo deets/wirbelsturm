@@ -181,10 +181,6 @@ class TestWidget(Widget):
 
         self.add_call("""
         $(function() {
-           $('#%s').click(
-              function() {
-                $.getJSON('/trigger');
-              }
-           );
+                      
         })
         """ % d.id)

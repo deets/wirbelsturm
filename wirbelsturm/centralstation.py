@@ -134,32 +134,36 @@ class CentralStation(object):
         class MainHandler(tornado.web.RequestHandler):
             callbacks = []
 
-            LATEST_MESSAGE_ID_COOKIE = "Latest-Message-ID"
-
 
             @tornado.web.asynchronous
             def get(self):
                 logger.debug("/dispatch called")
                 last_message_id = None
-                cookie = self.request.headers.get(self.LATEST_MESSAGE_ID_COOKIE)
-                if cookie:
-                    last_message_id = central_station.cookie_to_mid(cookie)
-                    logger.debug("found header")
-           
+                arguments = self.request.arguments
+                if "latest_message_id" in arguments:
+                    lmid = self.get_argument("latest_message_id")
+                    last_message_id = central_station.cookie_to_mid(lmid)
                 logger.debug("waiting for messages, lmid: %r", last_message_id)
                 central_station.listen(self, last_message_id)
+                # in the meantime, there might have been messages
+                # which we want to dispatch immediatly of course.
+                # So we invoke the ioloop-callback. It will
+                # either dispatch to this handler, or keep
+                # it around until something arrives.
+                central_station.ioloop_callback()
 
 
             def dispatch_messages(self, messages):
                 # we take the next message-id here, because the bisect
                 # in the callback works as greater-equal, not strict greater
                 last_mid = central_station.next_message_id(messages[-1].id)
-                logger.debug("dispatch_messages, future lmid: %r", last_mid)
-                data = dumps({"messages" : [m.__json__() for m in messages]})
-                self.set_header("Content-Type", "application/json")
                 lmid = central_station.mid_to_cookie(last_mid)
-                self.set_header(self.LATEST_MESSAGE_ID_COOKIE,
-                                lmid)
+                logger.debug("dispatch_messages, future lmid: %r", last_mid)
+                data = dumps(
+                    {"messages" : [m.__json__() for m in messages],
+                     "latest_message_id" : lmid
+                 })
+                self.set_header("Content-Type", "application/json")
                 self.write(data)
                 logger.debug("data: %r", data)
                 self.finish()
@@ -174,18 +178,21 @@ class CentralStation(object):
         can be called in a different thread than the tornado-application,
         but this callback will then be called from within the tornado-event-loop.
         """
+
         logger.debug("ioloop_callback")
         with self.lock:
             messages = list(self.messages)
 
         logger.debug(repr(messages))
         new_listeners = []
+        smallest_offset = None
         for mid, listener in self.listeners:
             logger.debug("listener, waiting for lmid: %r", mid)
             offset = bisect.bisect(messages, (mid, None))
             if messages[offset:]:
                 logger.debug("offset: %i", offset)
                 listener.dispatch_messages([m for _, m in messages[offset:]])
+                smallest_offset = min(offset, smallest_offset) if smallest_offset is not None else offset
             else:
                 # we didn't yet have enough messages to
                 # dispatch, so we re-append this bugger.
@@ -194,3 +201,6 @@ class CentralStation(object):
                 
         self.listeners[:] = new_listeners
         logger.debug("remaining listeners: %r", self.listeners)
+        if smallest_offset is not None:
+            with self.lock:
+                self.messages = self.messages[smallest_offset+1:]

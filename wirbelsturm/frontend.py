@@ -97,6 +97,15 @@ def chat(usercookie):
         )
 
 
+typing = True
+@bottle.route('/trigger')
+def trigger():
+    global typing
+    CHAT.users.values()[0].typing(typing)
+    typing = not typing
+    return "Triggered"
+
+
 def make_app():
     app = make_middleware(default_app(), {
         'toscawidgets.middleware.inject_resources': True,

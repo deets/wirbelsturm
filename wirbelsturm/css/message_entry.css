@@ -4,6 +4,7 @@ div.message_entry
   height:80px;
   padding:8px;
   -moz-border-radius: 8px; /* FireFox 1+ */
+  -webkit-border-radius: 8px; /* FireFox 1+ */
   background-color: lightgreen;
 }
 

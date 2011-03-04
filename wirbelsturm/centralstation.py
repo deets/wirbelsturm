@@ -201,6 +201,6 @@ class CentralStation(object):
                 
         self.listeners[:] = new_listeners
         logger.debug("remaining listeners: %r", self.listeners)
-        if smallest_offset is not None:
-            with self.lock:
-                self.messages = self.messages[smallest_offset+1:]
+        # if smallest_offset is not None:
+        #     with self.lock:
+        #         self.messages = self.messages[smallest_offset+1:]

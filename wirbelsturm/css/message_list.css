@@ -4,6 +4,7 @@ div.message_list
   height:400px;
   padding:8px;
   -moz-border-radius: 8px; /* FireFox 1+ */
+  -webkit-border-radius: 8px; /* Safari 3+, Chrome */
   background-color: green;  
   margin-bottom: 10px;
 }
@@ -22,5 +23,8 @@ div.message_list li
   padding:2px;
   -moz-border-radius-topright: 4px; /* FireFox 1+ */
   -moz-border-radius-bottomright: 4px; /* FireFox 1+ */
-   -moz-border-radius-bottomleft: 4px; /* FireFox 1+ */
+  -moz-border-radius-bottomleft: 4px; /* FireFox 1+ */
+  -webkit-border-top-right-radius: 4px; /* FireFox 1+ */
+  -webkit-border-bottom-right-radius: 4px; /* FireFox 1+ */
+  -webkit-border-bottom-left-radius: 4px; /* FireFox 1+ */
 }

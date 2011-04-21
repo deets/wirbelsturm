@@ -1,0 +1,12 @@
+* nginx starten
+* paster starten
+
+  (wirbelsturm)$ paster serve --reload development.ini
+
+* Im Tab auf localhost:10000 gehen
+
+Anmelden
+
+* Im anderen Tab oder Browser auf localhost:10000 gehen
+
+Anmelden. Tippen. Sehen, wie im anderen Browser was passiert

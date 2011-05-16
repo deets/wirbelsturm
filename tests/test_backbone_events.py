@@ -90,4 +90,7 @@ def test_bound_methods_are_bound_once_only():
     t.bind("foo", listener.callback)
     t.trigger("foo")
     assert len(listener.events) == 1
+    t.unbind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 1
     

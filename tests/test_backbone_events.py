@@ -69,7 +69,7 @@ def test_unbinding():
     assert len(events) == 1
     
 
-def test_bound_methods_are_bound_once_only():
+def test_bound_methods_are_bound_once_only_and_can_be_unbound():
 
     class Listener(object):
 
@@ -90,7 +90,72 @@ def test_bound_methods_are_bound_once_only():
     t.bind("foo", listener.callback)
     t.trigger("foo")
     assert len(listener.events) == 1
+    t.bind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 2
+
     t.unbind("foo", listener.callback)
     t.trigger("foo")
-    assert len(listener.events) == 1
+    assert len(listener.events) == 2
     
+
+def test_class_methods_are_bound_once_only_and_can_be_unbound():
+
+    class Listener(object):
+
+        events = []
+
+
+        @classmethod
+        def callback(cls, *args, **kwargs):
+            cls.events.append((args, kwargs))
+
+            
+    class Test(Event):
+        pass
+
+    listener = Listener()
+    
+    t = Test()
+    t.bind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 1
+    t.bind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 2
+
+    t.unbind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 2
+    
+
+def test_static_methods_are_bound_once_only_and_can_be_unbound():
+
+    class Listener(object):
+
+        events = []
+
+
+        @staticmethod
+        def callback(*args, **kwargs):
+            Listener.events.append((args, kwargs))
+
+            
+    class Test(Event):
+        pass
+
+    listener = Listener()
+    
+    t = Test()
+    t.bind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 1
+    t.bind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 2
+
+    t.unbind("foo", listener.callback)
+    t.trigger("foo")
+    assert len(listener.events) == 2
+    
+

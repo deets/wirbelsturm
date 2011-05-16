@@ -25,4 +25,6 @@ class Event(object):
         
 
     def unbind(self, event_name, callback):
-        self._event_bindings[event_name].remove(weakref.ref(callback))
+        if not isinstance(callback, types.MethodType):
+            callback = weakref.ref(callback)
+        self._event_bindings[event_name].remove(callback)

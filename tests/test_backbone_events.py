@@ -85,18 +85,31 @@ def test_bound_methods_are_bound_once_only_and_can_be_unbound():
         pass
 
     listener = Listener()
+
+    events = listener.events
     
     t = Test()
     t.bind("foo", listener.callback)
-    t.trigger("foo")
-    assert len(listener.events) == 1
+    t.trigger("foo", 1)
+    assert len(events) == 1
+    assert events[-1] == ((1,), {})
+
+    # double bind has no double call
     t.bind("foo", listener.callback)
     t.trigger("foo")
-    assert len(listener.events) == 2
+    assert len(events) == 2
 
+    # unbind, no call anymore
     t.unbind("foo", listener.callback)
     t.trigger("foo")
-    assert len(listener.events) == 2
+    assert len(events) == 2
+
+    # delete, must make reference go away
+    t.bind("foo", listener.callback)
+    del listener
+    t.trigger("foo")
+    assert len(events) == 2
+    assert len(t._event_bindings["foo"]) == 0
     
 
 def test_class_methods_are_bound_once_only_and_can_be_unbound():

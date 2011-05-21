@@ -82,10 +82,12 @@ class Model(Event):
     """
 
 
-    def __init__(self):
+    def __init__(self, defaults=None):
         super(Model, self).__init__()
         self.initialize()
         self._properties = {}
+        if defaults is not None:
+            self._properties.update(defaults)
         
         
 

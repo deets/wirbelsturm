@@ -81,6 +81,12 @@ class Model(Event):
     A very literal translation of the backbone.js Model-class.
     """
 
+    UNDEFINED = object()
+    """
+    A sentinel value used to convey the undefined state
+    of e.g. unset properties - something JS has, but Python lacks.
+    """
+    
 
     def __init__(self, defaults=None):
         super(Model, self).__init__()
@@ -106,11 +112,11 @@ class Model(Event):
             changed = True
             self._properties[key] = value
             if not silent:
-                self.trigger("change:" + key, self, key, value)
+                self.trigger("change:" + key, self, value)
             
-
         if changed and not silent:
             self.trigger("change", self)
+
         return True
     
     
@@ -118,3 +124,11 @@ class Model(Event):
         return self._properties[name]
 
     
+    def unset(self, name, silent=False):
+        if name in self._properties:
+            del self._properties[name]
+            if not silent:
+                self.trigger("change:" + name, self, self.UNDEFINED)
+            
+            if not silent:
+                self.trigger("change", self)

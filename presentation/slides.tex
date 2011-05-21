@@ -1,0 +1,114 @@
+% This text is proprietary.
+% It's a part of presentation made by myself.
+% It may not used commercial.
+% The noncommercial use such as private and study is free
+% Sep. 2005 
+% Author: Sascha Frank 
+% University Freiburg 
+% www.informatik.uni-freiburg.de/~frank/
+% additional use of \usepackage{beamerthemesplit}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+\usepackage{beamerthemesplit} % new 
+\begin{document}
+\title{Wirbelsturm - der Weg zum Erfolg} 
+\author{Diez B. Roggisch} 
+\date{\today} 
+
+\frame{\titlepage} 
+
+\frame{\frametitle{Inhalt}\tableofcontents} 
+
+
+\section{Der Plan} 
+\frame{\frametitle{Title} 
+  Der Weg zum Erfolg
+  \begin{itemize}
+  \item Schicken, schnellen Internet-Chat bauen. \pause
+  \item ??? \pause 
+  \item Erfolg!
+  \end{itemize} 
+}
+
+
+\subsection{Die Hürden} 
+\frame{
+  \frametitle{Das latente Problem}
+  \begin{itemize}
+  \item Latenz so gering wie möglich \pause
+  \item Client $\rightarrow$ Server: alles super \pause
+  \item Server $\rightarrow$ Client: Nix da
+  \end{itemize} 
+}
+
+\frame{
+  \frametitle{Lösungen des letzen Jahrhunderts} 
+  \begin{itemize}
+  \item \texttt{\textless meta http-equiv='refresh' content='1'\textgreater}\pause
+  \item \texttt{setTimeout(ajax\_callback, 500)}\pause
+  \item Flash
+  \end{itemize}
+}
+
+
+\frame{
+  \frametitle{Lösungen des kommenden Jahrhunderts} 
+  Websockets\pause
+  \begin{itemize}
+  \item Sind noch nicht allgemein verfügbar\pause
+  \item Wegen Sicherheitsfragen aus FF4 verbannt\pause
+  \end{itemize} 
+}
+
+\section{Die Rettung}
+
+\frame{
+  \frametitle{Der Ritter in schillernder Rüstung}
+  Comet/Long-Poll\pause
+  \begin{itemize}
+    \item Client setzt AJAX-Request ab\pause
+    \item Server antwortet erstmal nicht\pause
+    \item Wenn Timout $\rightarrow$ neues Request\pause
+    \item Wenn's was zu sagen gibt $\rightarrow$ Server antwortet
+  \end{itemize}
+}
+
+\frame{
+  \frametitle{Rostige Rüstungsteile}
+  \begin{itemize}
+    \item Lange offene Requests belegen Resourcen\pause
+    \item ``Klassische'' Webserver wie Apache/CherryPy/Paster haben damit Probleme\pause
+    \item Der SuperChat skaliert nicht!
+  \end{itemize}
+}
+
+\section{Frischer Wind}
+\frame{
+  \frametitle{Tornado}
+  \begin{itemize}
+    \item Ursprünglich von FriendFeed, gekauft von Facebook\pause
+    \item event (epoll) basiert\pause
+    \item $\Rightarrow$ viele parallele Verbindungen möglich
+  \end{itemize}
+}
+
+\section{Section no. 4}
+\subsection{blocs}
+\frame{\frametitle{blocs}
+
+\begin{block}{title of the bloc}
+bloc text
+\end{block}
+
+\begin{exampleblock}{title of the bloc}
+bloc text
+\end{exampleblock}
+
+
+\begin{alertblock}{title of the bloc}
+bloc text
+\end{alertblock}
+}
+\end{document}
+

@@ -1,3 +1,12 @@
+"""
+A Python-implementation of the backbone.js framework.
+
+  http://documentcloud.github.com/backbone/
+
+It's purpose is to deliver a serverside implementation
+that follows the same patterns.
+"""
+
 import weakref
 import types
 from collections import defaultdict
@@ -65,3 +74,45 @@ class Event(object):
         if not isinstance(callback, types.MethodType):
             callback = weakref.ref(callback)
         self._event_bindings[event_name].remove(callback)
+
+
+class Model(Event):
+    """
+    A very literal translation of the backbone.js Model-class.
+    """
+
+
+    def __init__(self):
+        super(Model, self).__init__()
+        self.initialize()
+        self._properties = {}
+        
+        
+
+    def initialize(self):
+        """
+        Stub implementation to make super() work.
+        """
+        pass
+
+
+    def set(self, properties, silent=False):
+        changed = False
+        for key, value in properties.iteritems():
+            if key in self._properties and self._properties[key] == value:
+                continue
+            changed = True
+            self._properties[key] = value
+            if not silent:
+                self.trigger("change:" + key, self, key, value)
+            
+
+        if changed and not silent:
+            self.trigger("change", self)
+        return True
+    
+    
+    def get(self, name):
+        return self._properties[name]
+
+    

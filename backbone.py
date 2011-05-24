@@ -6,7 +6,8 @@ A Python-implementation of the backbone.js framework.
 It's purpose is to deliver a serverside implementation
 that follows the same patterns.
 """
-
+import threading
+from itertools import count
 import weakref
 import types
 from collections import defaultdict
@@ -86,14 +87,39 @@ class Model(Event):
     A sentinel value used to convey the undefined state
     of e.g. unset properties - something JS has, but Python lacks.
     """
+
+    DEFAULTS = UNDEFINED
+    """
+    If defined as a dictionary in a subclass, used as default-values
+    for properties.
+    """
+
+    ID_CREATORS = {}
+
+    ID_LOCK = threading.Lock()
     
 
-    def __init__(self, defaults=None):
+    def __init__(self, properties=None):
         super(Model, self).__init__()
         self.initialize()
         self._properties = {}
-        if defaults is not None:
-            self._properties.update(defaults)
+        if self.DEFAULTS is not self.UNDEFINED:
+            self._properties.update(self.DEFAULTS)
+        if properties is not None:
+            self._properties.update(properties)
+
+        if not "id" in self._properties:
+            self._properties["id"] = self.create_id()
+        self.id = self._properties["id"]
+        
+
+    @classmethod
+    def create_id(cls):
+        with cls.ID_LOCK:
+            if cls not in cls.ID_CREATORS:
+                cls.ID_CREATORS[cls] = count()
+                
+        return "%s_%i" % (cls.__name__ , cls.ID_CREATORS[cls].next())
         
         
 
@@ -132,3 +158,11 @@ class Model(Event):
             
             if not silent:
                 self.trigger("change", self)
+
+
+    def clear(self, silent=False):
+        if self._properties:
+            self._properties = {}
+            if not silent:
+                self.trigger("change", self)
+                

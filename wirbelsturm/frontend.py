@@ -46,7 +46,7 @@ TEMPLATE_PATH.append(os.path.dirname(__file__))
 
 
 logger = logging.getLogger(__name__)
-        
+
 
 signup_form = SignupForm("signup_form", action="/register")
 
@@ -66,7 +66,7 @@ def index():
 @bottle.route('/register', method="POST")
 def register():
     try:
-        value = signup_form.validate(request.POST)
+        value = signup_form.validate(dict(request.POST.iteritems()))
     except Invalid:
         return index()
 

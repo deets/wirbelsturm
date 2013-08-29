@@ -15,7 +15,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=[
-        "abl.jquery",
+        "abl.jquery >= 1.5",
         "abl.util",
         "bottle",
         "Genshi",

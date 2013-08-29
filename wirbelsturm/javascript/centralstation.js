@@ -17,9 +17,14 @@ var CentralStation = Backbone.Model.extend(
             if(lmid !== null) {
                 url = url + "?latest_message_id=" +lmid;
             }
-            var d = $.getJSON(url).
-                success(this.dispatch).
-                error(this.error);
+            $.ajax(
+                {
+                    "url" :  url, 
+                    "success" : this.dispatch,
+                    "error" : this.error,
+                    "dataType" : "json"
+                }
+            );
             if(this.get("state") != "running") {
                 this.set({"state" : "running"});                
             }
@@ -54,9 +59,9 @@ var CentralStation = Backbone.Model.extend(
         /*
          * 
          */
-        error : function(result) {
+        error : function(xhr, status, error) {
             // in case of timeout, just re-start
-            if("status" in result && result.status == 504) {
+            if(xhr.status == 504) {
                 this.start();           
             } else {
                 this.set({ "state" : "error"});

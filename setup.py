@@ -24,6 +24,7 @@ setup(
         "tornado",
         "tw.forms",
         "WSGIUtils",
+        "mako",
         ],
     classifiers = [
         'Development Status :: 3 - Alpha',

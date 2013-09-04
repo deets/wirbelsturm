@@ -1,15 +1,12 @@
-<html>
+<html ng-app>
   <head>
   </head>
-  <body ng-app>
+  <body>
     <div id="content">
       <h1>SuperChat</h1>
-      <div id="left">
-	{{!message_list}}
-	{{!message_entry}}
-      </div>
+      <div id="left"/>
       <div id="right">
-	{{!user_list}}
+	${user_list | n}
       </div>
     </div>
   </body>

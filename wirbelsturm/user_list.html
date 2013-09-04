@@ -1,7 +1,10 @@
-<div xmlns:py="http://genshi.edgewall.org/" id="${id}" class="${css_class}">
+<div xmlns:py="http://genshi.edgewall.org/" id="${id}" class="${css_class}" ng-controller="UserListView">
   <ul>
     <li>Users</li>
   </ul>
   <ul class="entries">
+    <li ng-repeat="user in users" ng-class="typingclass(user.typing)">
+      {{user.id}}
+    </li>
   </ul>
 </div>

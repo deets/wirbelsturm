@@ -20,77 +20,51 @@ UserList = Backbone.Collection.extend(
             central_station.bind("user_list", this.dispatch);
         },
 
-	dispatch : function(operation, payload) {
-	    switch(operation) {
-	    case "add":
-		this.add(new this.model(payload));
-		break;
-	    case "modify":
-		var id = payload.id;
-		delete payload.id;
-		var m = this.get(id);
-		m.set(payload);
-		break;
-	    }
-	}
+        dispatch : function(operation, payload) {
+            switch(operation) {
+            case "add":
+                this.add(new this.model(payload));
+                break;
+            case "modify":
+                var id = payload.id;
+                delete payload.id;
+                var m = this.get(id);
+                m.set(payload);
+                break;
+            }
+            var userlist = [];
+            $.each(this.models, function(_, user)
+                   {
+                       userlist.push(user.attributes);
+                   }
+                  );
+            window.users_scope.users = userlist;
+            window.users_scope.$digest();
+        }
     },
     // class properties
     {
         // site-wide initialization
         setup_user_list : function(list_id, user_data) {
-            var user_list =new UserList();
-            var ul_view = new UserListView({
-                                               el : $(list_id).get(0),
-                                               model : user_list
-                                           });
-            window.user_view = ul_view;
+            var user_list = new UserList();
             window.user_list = user_list;
-	    $.each(user_data, function(_, ud)
-		   {
-		       user_list.add(new User(ud));
-		   }
-		  );
+            $.each(user_data, function(_, ud)
+                   {
+                       user_list.add(new User(ud));
+                   }
+                  );
         }
     }
 );
 
 
 
-UserListView = Backbone.View.extend( 
-    {
-
-        tagName : "div",
-        className : "user_list",
-        initialize : function() {
-            _.bindAll(this, "render", "add_user", "toggle_typing");
-            this.model.bind("add", this.add_user);
-            this.user2el = {};            
-	    this.ul = this.$("ul.entries");
-        },
-
-        add_user : function(user) {
-	    if(user.id in this.user2el)
-		return;
-            var li = $("<li/>");
-            li.text(user.get("name"));
-            $(this.ul).append(li);
-            this.user2el[user.id] = li;
-            user.bind("change:typing", this.toggle_typing);
-        },
-
-        render : function() {
-            return this;
-        },
-
-        toggle_typing : function(user) {
-            var li = this.user2el[user.id];
-            if(user.get("typing")) {
-                $(li).addClass("typing");
-            } else {
-                $(li).removeClass("typing");
-            }
-        }
+function UserListView($scope) {
+    $scope.users = [
+      ];
+    function typingclass(typing) {
+        return typing ? "typing" : "";
     }
-);
-
-
+    $scope.typingclass = typingclass;
+   window.users_scope = $scope;
+}

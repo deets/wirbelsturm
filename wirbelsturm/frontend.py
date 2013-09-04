@@ -11,6 +11,7 @@ from bottle import (
     run,
     request,
     response,
+    mako_view,
     view,
     default_app,
     route,
@@ -39,6 +40,8 @@ from .widgets import (
     TestWidget,
     MessageEntry,
     MessageList,
+    angular_js,
+    angular_test_js,
     )
 
 
@@ -88,13 +91,27 @@ def chat(usercookie):
         )
 
 
+@bottle.route('/angular')
+@mako_view("angular")
+def angular():
+    return dict(
+        user_list=user_list.render(CHAT.userinfos())
+        )
+
+
+
+# a small test method
+# to toggle the typing
+# state of user 1
 typing = True
+
 @bottle.route('/trigger')
 def trigger():
     global typing
     CHAT.users.values()[0].typing(typing)
     typing = not typing
     return "Triggered"
+
 
 
 def make_app():

@@ -1,7 +1,7 @@
 <html>
   <head>
   </head>
-  <body>
+  <body ng-app>
     <div id="content">
       <h1>SuperChat</h1>
       <div id="left">

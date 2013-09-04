@@ -20,6 +20,16 @@ from .validators import NotRegistered
 
 
 
+angular_js = JSLink(modname="wirbelsturm",
+                    filename="javascript/angular.js",
+                    )
+
+
+angular_test_js = JSLink(modname="wirbelsturm",
+                 filename="javascript/angular-test.js",
+                 javascript=[angular_js],
+                 )
+
 underscore_js = JSLink(modname="wirbelsturm",
                        filename="javascript/underscore.js"
                        )
@@ -102,7 +112,7 @@ user_list_css = CSSLink(modname=__name__,
 
 user_list_js = JSLink(modname=__name__,
                       filename="javascript/user_list.js",
-                      javascript=[backbone_js, my_central_station]
+                      javascript=[backbone_js, my_central_station, angular_js]
                       )
 
 
@@ -123,7 +133,7 @@ class UserList(Widget):
         $(function() {
           UserList.setup_user_list("#%(id)s", %(user_list)s);
         });
-        """ % dict(id=d.id, 
+        """ % dict(id=d.id,
                user_list=user_list))
 
 
@@ -164,11 +174,11 @@ class MessageEntry(Widget):
                         window.message_entry_view = new MessageEntryView({ el : el});
                         window.hub = new ChatHub(window.message_entry_view,
                                                  "%(endpoint)s",
-                                                 "%(usercookie)s" 
+                                                 "%(usercookie)s"
                                                  );
                       });
                       """ % d)
-    
+
 
 
 message_list_js = JSLink(modname=__name__,
@@ -201,9 +211,9 @@ class MessageList(Widget):
                         window.message_list_view = new MessageListView({ el : el});
                       });
                       """ % d)
-    
-    
-    
+
+
+
 class TestWidget(Widget):
 
 
@@ -212,12 +222,12 @@ class TestWidget(Widget):
     engine_name = "genshi"
 
     javascript = [my_central_station]
-    
+
     def update_params(self, d):
         super(TestWidget, self).update_params(d)
 
         self.add_call("""
         $(function() {
-                      
+
         })
         """ % d.id)
